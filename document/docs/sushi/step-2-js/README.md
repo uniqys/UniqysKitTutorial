@@ -20,7 +20,8 @@ uniqys dev-init
 "startApp": "node backend/server.js"
 ```
 
-p2pのネットワークを形成しないようにする（今回はローカルで動作するため）
+今回はローカルで動作させるため、mDNSを停止します
+#### uniqys.json
 ```json
 "network": {
   "port": 5665,

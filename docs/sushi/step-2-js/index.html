@@ -7,7 +7,7 @@
     <meta name="description" content="">
     
     
-    <link rel="preload" href="/UniqysKitTutorial/assets/css/0.styles.d61cff3e.css" as="style"><link rel="preload" href="/UniqysKitTutorial/assets/js/app.e25bbd50.js" as="script"><link rel="preload" href="/UniqysKitTutorial/assets/js/11.67b384f5.js" as="script"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/10.3f36a0bb.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/12.befc7fce.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/13.87cff79d.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/2.76904e22.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/3.bc714737.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/4.f0b8a33e.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/5.695105da.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/6.89c9c1ca.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/7.51339148.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/8.8eaabaf5.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/9.dc8c7904.js">
+    <link rel="preload" href="/UniqysKitTutorial/assets/css/0.styles.d61cff3e.css" as="style"><link rel="preload" href="/UniqysKitTutorial/assets/js/app.89790049.js" as="script"><link rel="preload" href="/UniqysKitTutorial/assets/js/11.c4d9d5ef.js" as="script"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/10.3f36a0bb.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/12.befc7fce.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/13.87cff79d.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/2.76904e22.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/3.bc714737.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/4.f0b8a33e.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/5.6f673792.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/6.89c9c1ca.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/7.51339148.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/8.8eaabaf5.js"><link rel="prefetch" href="/UniqysKitTutorial/assets/js/9.dc8c7904.js">
     <link rel="stylesheet" href="/UniqysKitTutorial/assets/css/0.styles.d61cff3e.css">
   </head>
   <body>
@@ -26,7 +26,7 @@
 
 uniqys dev-init
 </code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><h2 id="dapp-jsonを編集する"><a href="#dapp-jsonを編集する" aria-hidden="true" class="header-anchor">#</a> dapp.jsonを編集する</h2> <h4 id="sushi-dapp-json"><a href="#sushi-dapp-json" aria-hidden="true" class="header-anchor">#</a> sushi/dapp.json</h4> <p>実行されるappのコマンドを変更する</p> <div class="language-json line-numbers-mode"><pre class="language-json"><code><span class="token property">&quot;startApp&quot;</span><span class="token operator">:</span> <span class="token string">&quot;node backend/server.js&quot;</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>p2pのネットワークを形成しないようにする（今回はローカルで動作するため）</p> <div class="language-json line-numbers-mode"><pre class="language-json"><code><span class="token property">&quot;network&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>今回はローカルで動作させるため、mDNSを停止します</p> <h4 id="uniqys-json"><a href="#uniqys-json" aria-hidden="true" class="header-anchor">#</a> uniqys.json</h4> <div class="language-json line-numbers-mode"><pre class="language-json"><code><span class="token property">&quot;network&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span>
   <span class="token property">&quot;port&quot;</span><span class="token operator">:</span> <span class="token number">5665</span><span class="token punctuation">,</span>
   <span class="token property">&quot;address&quot;</span><span class="token operator">:</span> <span class="token string">&quot;0.0.0.0&quot;</span><span class="token punctuation">,</span>
   <span class="token property">&quot;libp2pConfig&quot;</span><span class="token operator">:</span> <span class="token punctuation">{</span>
@@ -286,6 +286,6 @@ app<span class="token punctuation">.</span><span class="token function">post</sp
         </a>
         →
       </span></p></div> </div> <!----></div></div>
-    <script src="/UniqysKitTutorial/assets/js/app.e25bbd50.js" defer></script><script src="/UniqysKitTutorial/assets/js/11.67b384f5.js" defer></script>
+    <script src="/UniqysKitTutorial/assets/js/app.89790049.js" defer></script><script src="/UniqysKitTutorial/assets/js/11.c4d9d5ef.js" defer></script>
   </body>
 </html>

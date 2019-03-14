@@ -151,11 +151,35 @@ uniqys dev-init
 ls -a # .data dapp.json uniqys.json frontend/ validatorKey.json
 ```
 
+今回はローカルで動作させるため、mDNSを停止します
+#### uniqys.json
+```json
+"network": {
+  "port": 5665,
+  "address": "0.0.0.0",
+  "libp2pConfig": {
+    "peerDiscovery": {
+      "mdns": {
+        "interval": 1000,
+        "broadcast": true,
+        "serviceTag": "uniqys.local",
+        "enabled": false
+      },
+      "bootstrap": {
+        "interval": 5000,
+        "list": [],
+        "enabled": false
+      }
+    }
+  }
+}
+```
+
 これでuniqysを開発開始できます
 
 ## uniqys nodeを立ち上げてみる
 
-`uniqys start` で一緒にappサーバを立ち上げることができます。その設定を`dapp.json` に書くことができます。
+Uniqys起動と同時に立ち上がるバックエンドの設定を`dapp.json` に書くことができます。
 
 #### /messages/dapp.json
 ```json
@@ -163,7 +187,7 @@ ls -a # .data dapp.json uniqys.json frontend/ validatorKey.json
 ```
 
 ## appサーバを実装する
-これから、 `backend/server.js` にappサーバを実装していきます
+これから、 `backend/server.js` にバックエンドを実装していきます
 
 まず、backendディレクトリを作り、 `npm init` します
 ```bash
