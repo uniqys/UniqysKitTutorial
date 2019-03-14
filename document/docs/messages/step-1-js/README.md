@@ -36,7 +36,7 @@ npm run serve
 
 不要なcomponentsとimportも消します
 
-#### sushi/frontend/src/App.vue
+#### messages/frontend/src/App.vue
 ```html
 <template>
   <div id="app">
