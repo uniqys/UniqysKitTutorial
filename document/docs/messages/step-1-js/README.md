@@ -69,7 +69,7 @@ inputとbuttonを設置します
 dataの中に変数を定義します
 
 #### /messages/frontend/src/App.vue
-```js
+```html
 <script>
 export default {
   name: 'app',
@@ -257,6 +257,8 @@ npm run build
 これにより、 `messages/frontend/dist` に、フロントエンドのファイルが生成されます
 
 次に、生成されたファイルをexpressで配信できるようにします
+
+バックエンドのコードに追加するときは、 **`app.use(bodyParser())` と　`app.listen(APP_PORT, APP_HOST)` の間に記載** してください
 
 #### messages/backend/server.js
 ```js

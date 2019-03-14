@@ -119,12 +119,14 @@ data() {
 
 #### messages/frontend/src/App.vue
 ```js
-fetch() {
-  this.client.get('/api/message').then((res) => {
-    const messages = res.data.messages;
-    this.messages = messages
-  });
-},
+methods: {
+  fetch() {
+    this.client.get('/api/message').then((res) => {
+      const messages = res.data.messages;
+      this.messages = messages
+    });
+  },
+}
 ```
 `GET /api/message` が配列で帰ってくるようになったので、 `fetch()` の受け取り方を変えました
 
