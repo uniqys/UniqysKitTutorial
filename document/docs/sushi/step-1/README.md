@@ -322,7 +322,7 @@ methods: {
 <img width="400" :src="$withBase('/img/sushi/step-1/buy.png')" alt="foo">
 
 ## おすし画像を作ってみる
-おすしの画像は [sushi.zip](https://github.com/nanotumblr/UniqysKitSample/blob/master/sushi/step-1/frontend/public/img/sushi.zip) を利用してください
+おすしの画像は [sushi.zip](https://github.com/uniqys/UniqysKitTutorial/blob/master/sushi/step-1/frontend/public/img/sushi.zip) を利用してください
 
 `sushi/frontend/public/img/sushi/` 以下に配置してください
 

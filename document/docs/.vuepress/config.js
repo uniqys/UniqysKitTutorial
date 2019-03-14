@@ -1,5 +1,5 @@
 module.exports = {
-  base: '/UniqysKitSample/',
+  base: '/UniqysKitTutorial/',
   title: 'Uniqys Kit Simple Samples',
   dest: '../docs',
   markdown: {
@@ -8,7 +8,7 @@ module.exports = {
   themeConfig: {
     nav: [
         { text: 'Uniqys Kit', link: 'https://uniqys.net/ja' },
-        { text: 'GitHub', link: 'https://github.com/uniqys' },
+        { text: 'GitHub', link: 'https://github.com/uniqys/UniqysKitTutorial' },
     ],
     sidebar: [
       {
