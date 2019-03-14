@@ -8,5 +8,5 @@
     }
   ],
   "initApp": "",
-  "startApp": "python3 backend/python/server.py"
+  "startApp": "node backend/js/server.js"
 }

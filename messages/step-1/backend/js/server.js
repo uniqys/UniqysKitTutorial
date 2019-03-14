@@ -22,10 +22,12 @@ async function getMessage () {
   })
 }
 
+app.use('/', express.static('frontend/dist'));
+
 app.get('/api/message', async (_, res) => {
   const message = await getMessage()
   res.send({ message });
-});
+})
 
 app.post('/api/message', async (req, res) => {
   // const sender = req.header('uniqys-sender')
