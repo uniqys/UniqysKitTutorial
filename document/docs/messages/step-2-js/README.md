@@ -100,7 +100,7 @@ app.get('/api/message', async (_, res) => {
   const count = await getCount()
   const messages = await getMessages(count)
   res.send({ messages });
-});
+})
 ```
 
 ## frontendで取得できるようにしてみる
@@ -110,7 +110,7 @@ app.get('/api/message', async (_, res) => {
 data() {
   return {
     // ...
-    messages: []
+    messages: [],
     // ...
   }
 },
