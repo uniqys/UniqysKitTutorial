@@ -20,16 +20,6 @@ vue create frontend
 cd frontend
 ```
 
-`package.json` を編集して、ポート番号を変更しておきます
-#### /messages/frontend/package.json
-```js
-"scripts": {
-  "serve": "vue-cli-service serve --port 3000",
-  "build": "vue-cli-service build",
-  "lint": "vue-cli-service lint"
-},
-```
-
 実行します
 ```bash
 # /messages/frontend
@@ -143,6 +133,8 @@ inputに文字を入力して送信を押してみると、messageの内容が�
 <img :src="$withBase('/img/messages/mes6.png')" alt="after submit">
 
 ## backendの環境構築
+これから、backendの環境構築をはじめます
+
 <img :src="$withBase('/img/Uniqys.png')" alt="after submit">
 
 まず、uniqysのセットアップをします
@@ -218,7 +210,7 @@ app.listen(APP_PORT, APP_HOST)
 
 uniqysを立ち上げてみましょう
 
-frontendが動いてる場合は、もう一つのターミナルを起動してください
+frontendが動いてる場合は、Ctrl-Cで終了して、以下を実行してください
 
 ```bash
 # /messages/backend
@@ -230,6 +222,34 @@ uniqys start
 `http://localhost:8080/hello` にアクセスしてみましょう。helloと出力されるはずです
 
 Gateway(8080)を経由して、app(5650)を叩いています
+
+## フロントエンドを配信する
+frontendをビルドします
+```bash
+# /messages/frontend
+
+npm run build
+```
+これにより、 `messages/frontend/dist` に、フロントエンドのファイルが生成されます
+
+次に、生成されたファイルをexpressで配信できるようにします
+
+#### messages/backend/server.js
+```js
+app.use('/', express.static('frontend/dist'));
+```
+
+今動いているUniqysをCtrl-Cで止め、Uniqysを再スタートしてみましょう
+```bash
+# /messages/
+
+uniqys start
+```
+
+`http://localhost:8080` にアクセスすると、これまで作成してきたフロントエンドのページが確認できます
+
+今後、フロントエンドの更新を行う場合は、frontendディレクトリで `npm run build` を行ってください
+
 
 ## messageを書き込み/読み込みできるようにしてみる
 
@@ -280,29 +300,6 @@ app.listen(APP_PORT, APP_HOST)
 さきほどfrontendで作成したフォームで、実際にブロックチェーンの情報を操作できるようにしてみます
 
 ## frontendの修正
-
-CORS対策のために、proxyを設定します
-
-`messages/frontend/vue.config.js`を作成し、以下のように設定します
-
-#### /messages/frontend/vue.config.js
-```js
-module.exports = {
-  devServer: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      },
-      "/uniqys": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      }
-    }
-  }
-};
-```
-
 開発中は、フロントエンドからGatewayを叩くとき、easy-clientを利用すると便利です
 
 利用していきましょう
@@ -321,7 +318,7 @@ import { EasyClientForBrowser } from '@uniqys/easy-client'
 data() {
   return {
     // ...
-    client: new EasyClientForBrowser('http://localhost:3000'),
+    client: new EasyClientForBrowser('http://localhost:8080'),
     // ...
   }
 },
