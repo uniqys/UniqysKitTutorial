@@ -27,7 +27,7 @@ cd frontend
 npm run serve
 ```
 
-ブラウザで `http://localhost:3000/` にアクセスすると、vueの最初のページが表示されるはずです。
+ブラウザで `http://localhost:8080/` にアクセスすると、vueの最初のページが表示されるはずです。
 
 <img :src="$withBase('/img/messages/mes1.png')" alt="Vue default">
 
