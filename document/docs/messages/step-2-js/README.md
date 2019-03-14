@@ -159,6 +159,8 @@ templateを変更して、tableで表示してみました
 
 ## 動作確認
 
+frontendをbuildしてください
+
 uniqys nodeを`ctrl-c`で終了させたあともう一度 `uniqys start` してください
 
 ブラウザから確認すると、複数のメッセージが送信できるようになっているはずです

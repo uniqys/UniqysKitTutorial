@@ -34,16 +34,33 @@ npm run serve
 ## まっさらなページにしてみる
 `messages/frontend/src/App.vue` をきれいにします
 
-#### /messages/frontend/src/App.vue
+不要なcomponentsとimportも消します
+
+#### sushi/frontend/src/App.vue
 ```html
 <template>
   <div id="app">
     <p>こんにちは！</p>
   </div>
 </template>
-```
 
-不要なcomponentsとimportも消します
+<script>
+export default {
+  name: 'app'
+}
+</script>
+
+<style>
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
+```
 
 ブラウザで確認するときれいになっているはずです。
 <img :src="$withBase('/img/messages/mes2.png')" alt="Hello!">
@@ -262,7 +279,7 @@ npm run build
 
 #### messages/backend/server.js
 ```js
-app.use('/', express.static('frontend/dist'));
+app.use('/', express.static('frontend/dist'))
 ```
 
 今動いているUniqysをCtrl-Cで止め、Uniqysを再スタートしてみましょう
@@ -337,7 +354,8 @@ npm install --save @uniqys/easy-client
 ```
 
 #### /messages/frontend/src/App.vue
-```js
+```html
+<script>
 import { EasyClientForBrowser } from '@uniqys/easy-client'
 
 
@@ -364,13 +382,14 @@ methods: {
     })
   }
 }
+</script>
 ```
 
 ## 動作確認する
 
-いちどuniqysのノードを `ctrl-c` で止め、もういちど `uniqys start` してみましょう
+frontendをbuildしてください
 
-frontendを `ctrl-c` で止め、もういちど `npm serve` してみましょう
+uniqysを `ctrl-c` で止め、もういちど `uniqys start` してみましょう
 
 ブラウザからフォームを送信すると、メッセージをブロックチェーン上に書き込めていることがわかります
 
