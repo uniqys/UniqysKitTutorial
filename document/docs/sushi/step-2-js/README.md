@@ -245,6 +245,14 @@ created() {
 npm install --save axios
 ``` 
 
+`server.js` 上部でINNER APIのホスト名、ポート番号を定義します
+#### sushi/backend/server.js
+```js
+const INNER_API_HOST = 'localhost'
+const INNER_API_PORT = 5651
+```
+
+Inner APIの `accounts/{address}/balance` で、そのアドレスの残高を取得します
 #### sushi/backend/server.js
 ```js
 app.get('/api/gari', async (req, res) => {
