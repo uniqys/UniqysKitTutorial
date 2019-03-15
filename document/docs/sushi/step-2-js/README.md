@@ -244,6 +244,8 @@ const INNER_API_PORT = 5651
 Inner APIの `accounts/{address}/balance` で、そのアドレスの残高を取得します
 #### sushi/backend/server.js
 ```js
+const axios = require('axios') // ファイルの一番上
+
 app.get('/api/gari', async (req, res) => {
   const { address } = req.query
   const uri = `http://${INNER_API_HOST}:${INNER_API_PORT}/accounts/${address}/balance`
