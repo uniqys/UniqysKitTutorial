@@ -243,7 +243,7 @@ export default {
 
 ## Gariの概念を導入していく
 
-templateブロックのsushi-blockの上あたりを以下のように書いてください
+templateブロックのsushi-wrapperの上あたりを以下のように書いてください
 
 #### sushi/frontend/src/App.vue
 ```html
