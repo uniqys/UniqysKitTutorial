@@ -385,6 +385,8 @@ app.post('/api/buy', async (req, res) => {
     price: 0
   })
 
+  await transferGari(sender, sushi.owner, sushi.price)
+
   await memcached.set(`sushi:${sushi.id}`, newSushi, 0, (err) => {
     if (err) {
       res.status(400).send(err)
@@ -393,8 +395,6 @@ app.post('/api/buy', async (req, res) => {
       res.sendStatus(200)
     }
   })
-  await transferGari(sender, sushi.owner, sushi.price)
-  res.send()
 })
 ```
 *売ってないおすしも、自分のおすしも買えちゃう・・*
