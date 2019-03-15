@@ -13,7 +13,7 @@ mkdir backend
 uniqys dev-init
 ```
 
-## dapp.jsonを編集する
+## Uniqysの設定ファイルを編集する
 #### sushi/dapp.json
 実行されるappのコマンドを変更する
 ```json
@@ -58,32 +58,42 @@ npm install --save express body-parser memcached
 
 ## `backend/server.js` を編集する
 
+ファイルは存在しないので、新しく作ってください
+
 ### sushi/backend/server.js
 ```js
 const express = require("express")
 const bodyParser = require("body-parser")
 const Memcached = require("memcached")
 
-const APP_HOST = '0.0.0.0'
-const APP_PORT = 5650
-const DB_HOST = 'localhost'
-const DB_PORT = 5652
+const APP_HOST = '0.0.0.0'  // backendサーバが動作するホスト名
+const APP_PORT = 5650       // backendサーバが動作するポート番号
+const DB_HOST = 'localhost' // inner memcachedのホスト名
+const DB_PORT = 5652        // inner memcachedのポート番号
 
-const app = express()
-const memcached = new Memcached(`${DB_HOST}:${DB_PORT}`)
-
+const app = express() // expressを使う準備
 app.use(bodyParser())
 
-app.listen(APP_PORT, APP_HOST)
+const memcached = new Memcached(`${DB_HOST}:${DB_PORT}`) // memcached apiを使う準備
+
+/* ここにサーバの内容を書いていく */
+
+app.listen(APP_PORT, APP_HOST) // listenを開始する
 ```
 
-## `POST '/api/generate'` を作る
+## `POST /api/generate` を作る
+sushiのDNAを生成するために、hash関数 `keccak` を利用します
+```bash
+# sushi/backend
+
+npm install --save keccak
+```
+
 #### sushi/backend/server.js
 ```js
-npm install --save keccak
+const keccak = require('keccak') // ファイルの一番上
 
-const keccak = require('keccak')
-
+// カウンターを増やす
 async function incrCount () {
   return new Promise((resolve, reject) => {
     memcached.incr('count', 1, (err, result) => {
@@ -109,8 +119,8 @@ app.post('/api/generate', async (req, res) => {
     price: 0,
     owner: sender,
     dna: keccak('keccak256').update(count.toString()).digest('hex'),
-    timestamp,
-    blockhash
+    timestamp: timestamp,
+    blockhash: blockhash
   }
 
   memcached.set(`sushi:${count}`, newSushi, 0, (err) => {
@@ -128,6 +138,7 @@ app.post('/api/generate', async (req, res) => {
 ## `GET /api/sushiList` を作る
 #### sushi/backend/server.js
 ```js
+// カウンターの数字を取得する
 async function getCount () {
   return new Promise((resolve, reject) => {
     memcached.get('count', (err, result) => {
@@ -138,10 +149,11 @@ async function getCount () {
   })
 }
 
+// sushiオブジェクトの配列を取得する
 async function getSushiList (count) {
   return new Promise((resolve, reject) => {
     if (!count) return resolve([])
-    const ids = new Array(count).fill(0).map((_, i) => i + 1) // XXX: fill(0)いる？
+    const ids = new Array(count).fill(0).map((_, i) => i + 1)
     memcached.getMulti(ids.map(id => `sushi:${id}`), (err, results) => {
       if (err) return reject(err)
       resolve(ids.map(id => results[`sushi:${id}`]))
@@ -157,60 +169,37 @@ app.get('/api/sushiList', async (_, res) => {
 ```
 
 ## frontendを修正してgenerateとsushiListを叩けるようにする
+Uniqysのeasy-clientをインストールする
 ```bash
 # sushi/frontend
 
 npm install --save @uniqys/easy-client
 ```
 
-`frontend/package.json` を修正
-#### sushi/frontend/package.json
-```json
-"serve": "vue-cli-service serve --port 3000",
-```
-uniqys nodeのgatewayが8080で、vueのデフォルトポート番号とかぶるので変更します
+## frontendからおすしを取得できるようにする
 
-## `frontend/vue.config.js` を作成
-#### sushi/frontend/vue.config.js
-```js
-module.exports = {
-  devServer: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      },
-      "/uniqys": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      }
-    }
-  }
-}
-```
-CORS対策です
-
-ここまでで、実際に動くことが確認できると思います
-
-## frontendからgatewayを叩く
-**ここから難しいかも**
-
+scriptの一番上
 #### sushi/frontend/src/App.vue
 ```js
 import { EasyClientForBrowser } from '@uniqys/easy-client'
 ```
 
+scriptのdata
 #### sushi/frontend/src/App.vue
 ```js
-{
-  client: new EasyClientForBrowser('http://localhost:3000'),
-  myGari: 0,
-  myAddress: '',
-  sushiList: []
+data() {
+  return {
+    client: new EasyClientForBrowser('http://localhost:8080'),
+    myGari: 0,
+    myAddress: '',
+    price: [],
+    sushiList: []
+  }
 }
 ```
-dataを修正 デフォルトはなにもなし
-
+デフォルトはなにもなしにする
+
+methodを追加していく
 #### sushi/frontend/src/App.vue
 ```js
 async fetchMyAddress() {
@@ -332,7 +321,9 @@ app.post('/api/generate', async (req, res) => {
   // ...
 
   await transferGari(sender, OPERATOR_ADDRESS, 100)
-  res.send()
+  
+  memcached.set(`sushi:${count}`, newSushi, 0, (err) => {
+    // ...
 })
 ```
 
@@ -406,9 +397,35 @@ app.post('/api/buy', async (req, res) => {
 ```
 *売ってないおすしも、自分のおすしも買えちゃう・・*
 
+## フロントエンドとつなげる！
+frontendをビルドします
+```bash
+# /messages/frontend
+
+npm run build
+```
+これにより、 `messages/frontend/dist` に、フロントエンドのファイルが生成されます
+
+次に、生成されたファイルをexpressで配信できるようにします
+
+#### messages/backend/server.js
+```js
+app.use('/', express.static('frontend/dist'))
+```
+
 ## 完成！
 お疲れ様でした！
 動作を確認してみましょう。一通りのおすし操作をすることができるようになりました！
+
+```bash
+# /messages/
+
+uniqys start
+```
+
+`http://localhost:8080` にアクセスすると、これまで作成してきたフロントエンドのページが確認できます
+
+今後、フロントエンドの更新を行う場合は、frontendディレクトリで `npm run build` を行ってください
 
 ## 追加課題
 - にぎったとき、あたらしいおすしが後ろの方に追加されてしまい微妙です。いい感じにしてみましょう

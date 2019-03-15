@@ -224,6 +224,7 @@ expressを使ってWebサーバを実装していくので、関連パッケー�
 npm install --save express body-parser memcached
 ```
 
+`backend/server.js` を作成し、実装していきます
 #### messages/backend/server.js
 ```js
 const express = require("express")

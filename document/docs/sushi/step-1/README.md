@@ -30,7 +30,7 @@ npm run serve
 ## まっさらなページにしてみる
 `frontend/src/App.vue` をきれいにします
 
-不要なcomponentsとimportも消します
+App.vueを以下のようにしてください
 
 #### sushi/frontend/src/App.vue
 ```html
@@ -64,6 +64,8 @@ export default {
 
 ## 自分のアドレスを作ってみる
 
+templateとscriptブロックを以下のようにします。styleは残しておいてください
+
 #### sushi/frontend/src/App.vue
 ```html
 <template>
@@ -88,6 +90,8 @@ export default {
 <img width="400" :src="$withBase('/img/sushi/step-1/address-vue.png')" alt="foo">
 
 ## おすしのデータを作ってみる
+
+scriptブロックを以下のようにします
 
 #### sushi/frontend/src/App.vue
 ```html
@@ -135,6 +139,8 @@ export default {
 
 ## おすしの枠を表示してみる
 
+templateブロックを以下のようにします
+
 #### sushi/frontend/src/App.vue
 ```html
 <template>
@@ -155,11 +161,15 @@ export default {
 <img width="400" :src="$withBase('/img/sushi/step-1/sushi-box.png')" alt="foo">
 
 ## styleを当ててみる
+
+v-for している行にclassを当てます
+
 #### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
 ```
 
+styleブロックを以下のようにしてください
 #### sushi/frontend/src/App.vue
 ```html
 <style>
@@ -187,6 +197,7 @@ export default {
 <img width="400" :src="$withBase('/img/sushi/step-1/sushi-style.png')" alt="foo">
 
 ## 表示を整えてみる
+templateブロックのsushi-boxクラスを以下のように書き換えてください
 #### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
@@ -199,6 +210,7 @@ export default {
 <img width="400" :src="$withBase('/img/sushi/step-1/display-sushi.png')" alt="foo">
 
 ## DNAからおすしの表示パターンを計算してみる
+templateブロックのsushi-boxクラスを以下のように書き換えてください
 #### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
@@ -210,6 +222,9 @@ export default {
 ```
 
 #### sushi/frontend/src/App.vue
+
+scriptブロックのexport defaultの中にmethodsを追加してください
+
 ```js
 export default {
   methods: {
@@ -227,11 +242,16 @@ export default {
 <img width="400" :src="$withBase('/img/sushi/step-1/sushi-dna.png')" alt="foo">
 
 ## Gariの概念を導入していく
+
+templateブロックのsushi-blockの上あたりを以下のように書いてください
+
 #### sushi/frontend/src/App.vue
 ```html
 <p>私のアドレス: {{ myAddress }}</p>
 <p>{{ myGari }} Gari</p>
 ```
+
+dataにmyGariを追加してください
 #### sushi/frontend/src/App.vue
 ```js
 data() {
@@ -245,11 +265,14 @@ data() {
 <img width="400" :src="$withBase('/img/sushi/step-1/gari.png')" alt="foo">
 
 ## おすしをにぎってみる（仮）
+templateブロックのmyGariを表示した下あたりに `にぎる` ボタンを配置してください
 #### sushi/frontend/src/App.vue
 ```html
 <p>{{ myGari }} Gari</p>
 <button @click="generate()">にぎる</button>
 ```
+
+scriptブロックのmethodsの中で、generateメソッドを追加してください
 
 #### sushi/frontend/src/App.vue
 ```js
@@ -270,6 +293,7 @@ methods: {
 <img width="400" :src="$withBase('/img/sushi/step-1/generate.png')" alt="foo">
 
 ## おすしを売ってみる（仮）
+templateブロックのsushi-boxを以下のようにしてください
 #### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-box" v-for="sushi in sushiList" :key="sushi.id">
@@ -285,28 +309,38 @@ methods: {
 ```
 
 #### sushi/frontend/src/App.vue
+
+scriptブロックのdataにpriceの配列を追加してください
+
+scriptブロックのmethodsにsellメソッドを追加してください
+
 ```js
-data() {
-  return {
-    price: [],
-  }
-}
-methods: {
-  sell(sushi, price) {
-    sushi.status = 'sell'
-    sushi.price = price
+export default {
+  data() {
+    return {
+      price: [],
+    }
   },
+  methods: {
+    sell(sushi, price) {
+      sushi.status = 'sell'
+      sushi.price = price
+    },
+  }
 }
 ```
 <img width="400" :src="$withBase('/img/sushi/step-1/sell.png')" alt="foo">
 
 ## おすしを買ってみる（仮）
 #### sushi/frontend/src/App.vue
+templateブロックのsushi-boxの最後に、以下を追加してください
 ```html
 <div v-if="myAddress !== sushi.owner && sushi.status === 'sell'">
   <button @click="buy(sushi)">買う！</button>
 </div>
 ```
+
+scriptブロックのmethodsにbuyメソッドを追加してください
 
 #### sushi/frontend/src/App.vue
 ```js
@@ -328,7 +362,7 @@ methods: {
 
 画像が読み込まれなかったりした場合は、`npm run serve` をCtrl-Cで止め、もう一度実行してみてください
 
-いまcode(sushi)してるところを置き換えます
+templateブロックの、いまcode(sushi)してるところを置き換えます
 #### sushi/frontend/src/App.vue
 ```html
 <div class="sushi-image-box">
@@ -338,6 +372,8 @@ methods: {
   <img :src="`/img/sushi/spice/spice-0${code(sushi).spice}.png`" alt="">
 </div>
 ```
+
+styleブロックに以下を追加してください
 
 #### sushi/frontend/src/App.vue
 ```css
