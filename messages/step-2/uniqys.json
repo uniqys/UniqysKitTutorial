@@ -21,7 +21,22 @@
     }
   },
   "network": {
-    "port": 1919,
-    "address": "0.0.0.0"
+    "port": 5665,
+    "address": "0.0.0.0",
+    "libp2pConfig": {
+      "peerDiscovery": {
+        "mdns": {
+          "interval": 1000,
+          "broadcast": true,
+          "serviceTag": "uniqys.local",
+          "enabled": false
+        },
+        "bootstrap": {
+          "interval": 5000,
+          "list": [],
+          "enabled": false
+        }
+      }
+    }
   }
 }

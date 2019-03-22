@@ -60,7 +60,7 @@ app.post('/api/message', async (req, res) => {
 
   const count = await incrCount()
 
-  memcached.set(`messages:${count}`, { sender, timestamp, blockhash, contents: message }, 0, (err) => {
+  memcached.set(`messages:${count}`, { id: count, sender, timestamp, blockhash, contents: message }, 0, (err) => {
     if (err) {
       res.status(400).send(err)
     }
@@ -69,5 +69,7 @@ app.post('/api/message', async (req, res) => {
     }
   })
 })
+
+app.use('/', express.static('frontend/dist'))
 
 app.listen(APP_PORT, APP_HOST)
