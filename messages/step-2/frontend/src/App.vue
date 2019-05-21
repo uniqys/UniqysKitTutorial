@@ -36,7 +36,7 @@ export default {
     }
   },
   created() {
-    this.client = new EasyClientForBrowser('http://localhost:3000')
+    this.client = new EasyClientForBrowser('http://localhost:8080')
     this.update()
   },
   methods: {
