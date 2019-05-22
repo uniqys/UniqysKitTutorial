@@ -20,12 +20,6 @@ vue create frontend
 cd frontend
 ```
 
-`package.json` を編集して、ポート番号を変更しておきます
-#### /messages/frontend/package.json
-```js
-"serve": "vue-cli-service serve --port 3000",
-```
-
 実行します
 ```bash
 # /messages/frontend
@@ -40,21 +34,37 @@ npm run serve
 ### まっさらなページにしてみる
 `frontend/src/App.vue` をきれいにします
 
-#### /messages/frontend/src/App.vue
+#### messages/frontend/src/App.vue
 ```html
 <template>
   <div id="app">
-    <p>あああ</p>
+    <p>こんにちは！</p>
   </div>
 </template>
-```
 
-不要なcomponentsとimportも消します
+<script>
+export default {
+  name: 'app'
+}
+</script>
+
+<style>
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
+```
 
 ブラウザで確認するときれいになっているはずです。
 <img :src="$withBase('/img/messages/mes2.png')" alt="Hello!">
 
-### メッセージ送信用のフォームを設置してみる
+
+## メッセージ送信用のフォームを設置してみる
 
 inputとbuttonを設置します
 
@@ -70,23 +80,22 @@ inputとbuttonを設置します
 
 <img :src="$withBase('/img/messages/mes3.png')" alt="set input box & button">
 
-
-### 入力した値が表示されるようにする
+## 入力した値が表示されるようにする
 
 dataの中に変数を定義します
 
 #### /messages/frontend/src/App.vue
-```js
-// ...
+```html
+<script>
 export default {
   name: 'app',
   data() {
     return {
       input: ''
     }
-  },
-  // ...
+  }
 }
+</script>
 ```
 
 フォームに入力した値がinput変数に入るようにします。ついでに下にその内容を表示するようにしてみます
@@ -106,7 +115,7 @@ export default {
 
 <img :src="$withBase('/img/messages/mes4.png')" alt="data binding">
 
-### 結果を表示できるようにする
+## 結果を表示できるようにする
 message変数に結果が入るようにしてみます
 
 #### /messages/frontend/src/App.vue
@@ -140,12 +149,14 @@ inputに文字を入力して送信を押してみると、messageの内容が�
 <img :src="$withBase('/img/messages/mes6.png')" alt="after submit">
 
 ## backendの環境構築
-https://cdn-images-1.medium.com/max/2600/1*kRWJUnGUh-txwPFZMKkWig.png
+これから、backendの環境構築をはじめます
+
+<img :src="$withBase('/img/Uniqys.png')" alt="after submit">
 
 まず、uniqysのセットアップをします
 
 uniqys-cliのインストール
-```
+```bash
 npm install -g @uniqys/cli
 ```
 
@@ -154,6 +165,30 @@ npm install -g @uniqys/cli
 
 uniqys dev-init
 ls -a # .data dapp.json uniqys.json frontend/ validatorKey.json
+```
+
+今回はローカルで動作させるため、mDNSを停止します
+#### uniqys.json
+```json
+"network": {
+  "port": 5665,
+  "address": "0.0.0.0",
+  "libp2pConfig": {
+    "peerDiscovery": {
+      "mdns": {
+        "interval": 1000,
+        "broadcast": true,
+        "serviceTag": "uniqys.local",
+        "enabled": false
+      },
+      "bootstrap": {
+        "interval": 5000,
+        "list": [],
+        "enabled": false
+      }
+    }
+  }
+}
 ```
 
 これでuniqysを開発開始できます
@@ -174,6 +209,8 @@ ls -a # .data dapp.json uniqys.json frontend/ validatorKey.json
 
 まず、backendディレクトリを作ります
 ```bash
+# /messages/
+
 mkdir backend
 cd backend
 ```
@@ -182,10 +219,10 @@ bottleを使ってWebサーバを実装するのでpipでインストールし�
 またデータをmemcachedプロトコルで管理するのでpymemcacheもインストールします
 
 ```bash
-# backend/
+# /messages/backend/
 pip install bottle pymemcache
 ```
-
+`backend/server.py` を作成し、実装していきます
 #### messages/backend/server.py
 ```python
 from bottle import route, run, request, response, static_file, hook
@@ -206,6 +243,9 @@ run(host=APP_HOST, port=APP_PORT)
 ## appサーバの動作確認する
 
 uniqysを立ち上げてみましょう
+
+frontendが動いてる場合は、Ctrl-Cで終了して、以下を実行してください
+
 ```bash
 # /messages/
 uniqys start
@@ -214,6 +254,44 @@ uniqys start
 `http://localhost:8080/hello` にアクセスしてみましょう。helloと出力されるはずです
 
 Gateway(8080)を経由して、app(5650)を叩いています
+
+## フロントエンドを配信する
+frontendをビルドします
+ここではpython 2系を使っていることを確認してください
+```bash
+# /messages/frontend
+
+npm run build
+```
+これにより、 `messages/frontend/dist` に、フロントエンドのファイルが生成されます
+
+次に、生成されたファイルをbottleで配信できるようにします
+
+バックエンドのコードに追加するときは、**`run(host=APP_HOST, port=APP_PORT)`の前に記載**してください
+
+#### messages/backend/server.py
+```python
+@route('/')
+def index():
+    return static_file('index.html', root='frontend/dist')
+
+@route('/<path:path>')
+def file_path(path):
+    return static_file(path, root='frontend/dist')
+```
+
+今動いているUniqysをCtrl-Cで止め、Uniqysを再スタートしてみましょう
+```bash
+# /messages/
+
+uniqys start
+```
+
+`http://localhost:8080` にアクセスすると、これまで作成してきたフロントエンドのページが確認できます
+
+今後、フロントエンドの更新を行う場合は、frontendディレクトリで `npm run build` を行ってください
+ただし、 `npm run build` するときはpython 2系、`uniqys start` するときはpython 3系を使用してください。
+
 
 ## messageを書き込み/読み込みできるようにしてみる
 
@@ -252,46 +330,27 @@ frontendからはJSONの形でメッセージが渡されるためjsonモジュ�
 さきほどfrontendで作成したフォームで、実際にブロックチェーンの情報を操作できるようにしてみます
 
 ## frontendの修正
-
-CORS対策のために、proxyを設定します
-
-`frontend/vue.config.js`を作成し、以下のように設定します
-
-#### /messages/frontend/vue.config.js
-```js
-module.exports = {
-  devServer: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      },
-      "/uniqys": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      }
-    }
-  }
-};
-```
-
 開発中は、フロントエンドからGatewayを叩くとき、easy-clientを利用すると便利です
 
 利用していきましょう
 
 ```bash
 # /messages/frontend/
+
 npm install --save @uniqys/easy-client
 ```
 
 #### /messages/frontend/src/App.vue
-```js
+```html
+<script>
 import { EasyClientForBrowser } from '@uniqys/easy-client'
 
 
 data() {
   return {
-    client: new EasyClientForBrowser('http://localhost:3000'),
+    // ...
+    client: new EasyClientForBrowser('http://localhost:8080'),
+    // ...
   }
 },
 created() {
@@ -310,6 +369,7 @@ methods: {
     })
   }
 }
+</script>
 ```
 
 ## 動作確認する
