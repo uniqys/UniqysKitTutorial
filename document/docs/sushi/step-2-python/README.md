@@ -367,9 +367,15 @@ npm run build
 
 次に、生成されたファイルをexpressで配信できるようにします
 
-#### sushi/backend/server.js
-```js
-app.use('/', express.static('frontend/dist'))
+#### sushi/backend/server.py
+```python
+@route('/')
+def index():
+    return static_file('index.html', root='frontend/dist')
+
+@route('/<path:path>')
+def file_path(path):
+    return static_file(path, root='frontend/dist')
 ```
 
 ## 完成！
