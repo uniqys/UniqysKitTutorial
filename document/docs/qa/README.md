@@ -12,6 +12,5 @@
 uniqys initしたディレクトリで以下を実行してください
 
 ```sh
-rm -rf .data
-uniqys init ./dapp.json
+uniqys init --reset
 ```
