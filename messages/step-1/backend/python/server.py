@@ -9,6 +9,14 @@ APP_PORT = 5650
 
 db = Client((DB_HOST, DB_PORT))
 
+@route('/')
+def index():
+    return static_file('index.html', root='frontend/dist')
+
+@route('/<path:path>')
+def file_path(path):
+    return static_file(path, root='frontend/dist')
+
 @route('/api/message')
 def get_message():
     message = db.get('message')

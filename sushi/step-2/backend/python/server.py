@@ -62,6 +62,14 @@ def transfer_gari(sender, to, value):
         data=json.dumps(dict({'to': str(to), 'value': int(value)})),
         headers={'Content-Type': 'application/json'})
 
+@route('/')
+def index():
+    return static_file('index.html', root='../frontend/dist')
+
+@route('/<path:path>')
+def file_path(path):
+    return static_file(path, root='../frontend/dist')
+
 @route('/api/gari')
 def get_gari():
     address = request.query.address
