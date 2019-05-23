@@ -365,7 +365,7 @@ npm run build
 ```
 これにより、 `sushi/frontend/dist` に、フロントエンドのファイルが生成されます
 
-次に、生成されたファイルをexpressで配信できるようにします
+次に、生成されたファイルをbottleで配信できるようにします
 
 #### sushi/backend/server.py
 ```python
