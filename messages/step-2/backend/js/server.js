@@ -46,6 +46,8 @@ async function incrCount () {
   })
 }
 
+app.use('/', express.static('frontend/dist'))
+
 app.get('/api/message', async (_, res) => {
   const count = await getCount()
   const messages = await getMessages(count)
@@ -69,7 +71,5 @@ app.post('/api/message', async (req, res) => {
     }
   })
 })
-
-app.use('/', express.static('frontend/dist'))
 
 app.listen(APP_PORT, APP_HOST)
