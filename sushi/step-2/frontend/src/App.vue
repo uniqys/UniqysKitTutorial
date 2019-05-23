@@ -85,7 +85,7 @@ export default {
   },
   data() {
     return {
-      client: new EasyClientForBrowser('http://localhost:3000'),
+      client: new EasyClientForBrowser('http://localhost:8080'),
       myGari: 0,
       myAddress: '',
       price: [],

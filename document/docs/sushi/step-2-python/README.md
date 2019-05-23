@@ -164,26 +164,6 @@ npm install --save @uniqys/easy-client
 ```
 uniqys nodeのgatewayが8080で、vueのデフォルトポート番号とかぶるので変更します
 
-## `frontend/vue.config.js` を作成
-#### sushi/frontend/vue.config.js
-```js
-module.exports = {
-  devServer: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      },
-      "/uniqys": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      }
-    }
-  }
-}
-```
-CORS対策です
-
 ここまでで、実際に動くことが確認できると思います
 
 ## frontendからgatewayを叩く
@@ -376,9 +356,42 @@ def buy_sushi():
 ```
 *売ってないおすしも、自分のおすしも買えちゃう・・*
 
+## フロントエンドとつなげる！
+frontendをビルドします
+```bash
+# /sushi/frontend
+
+npm run build
+```
+これにより、 `sushi/frontend/dist` に、フロントエンドのファイルが生成されます
+
+次に、生成されたファイルをbottleで配信できるようにします
+
+#### sushi/backend/server.py
+```python
+@route('/')
+def index():
+    return static_file('index.html', root='frontend/dist')
+
+@route('/<path:path>')
+def file_path(path):
+    return static_file(path, root='frontend/dist')
+```
+
 ## 完成！
 お疲れ様でした！
 動作を確認してみましょう。一通りのおすし操作をすることができるようになりました！
+
+```bash
+# /sushi/
+
+uniqys start
+```
+
+`http://localhost:8080` にアクセスすると、これまで作成してきたフロントエンドのページが確認できます
+
+今後、フロントエンドの更新を行う場合は、frontendディレクトリで `npm run build` を行ってください
+ただし、 `npm run build` するときはpython 2系、`uniqys start` するときはpython 3系を使用してください。
 
 ## 追加課題
 - にぎったとき、あたらしいおすしが後ろの方に追加されてしまい微妙です。いい感じにしてみましょう

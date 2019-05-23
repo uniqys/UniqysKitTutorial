@@ -50,6 +50,14 @@ class Dao:
 
 dao = Dao(DB_HOST, DB_PORT)
 
+@route('/')
+def index():
+    return static_file('index.html', root='frontend/dist')
+
+@route('/<path:path>')
+def file_path(path):
+    return static_file(path, root='frontend/dist')
+
 @route('/api/message')
 def get_message():
     count = dao.get_count()

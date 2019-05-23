@@ -402,15 +402,15 @@ app.post('/api/buy', async (req, res) => {
 ## フロントエンドとつなげる！
 frontendをビルドします
 ```bash
-# /messages/frontend
+# /sushi/frontend
 
 npm run build
 ```
-これにより、 `messages/frontend/dist` に、フロントエンドのファイルが生成されます
+これにより、 `sushi/frontend/dist` に、フロントエンドのファイルが生成されます
 
 次に、生成されたファイルをexpressで配信できるようにします
 
-#### messages/backend/server.js
+#### sushi/backend/server.js
 ```js
 app.use('/', express.static('frontend/dist'))
 ```
@@ -420,7 +420,7 @@ app.use('/', express.static('frontend/dist'))
 動作を確認してみましょう。一通りのおすし操作をすることができるようになりました！
 
 ```bash
-# /messages/
+# /sushi/
 
 uniqys start
 ```
