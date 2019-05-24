@@ -293,7 +293,7 @@ data() {
   'sushiList': [
     {
       'id'    : おすしのid,
-      'status': 販売の状態(cell/normal),
+      'status': 販売の状態(sell/normal),
       'price' : おすしの値段,
       'owner' : おすしの保有者のアドレス,
       'dna'   : おすしの特徴を表す文字列
