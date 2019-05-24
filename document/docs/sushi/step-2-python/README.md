@@ -213,6 +213,9 @@ created() {
 ページ更新時に取得してくる
 
 ## gariを取得できるようにする
+Uniqys KitのEasy Frameworkが提供している非公開APIの`Inner API`を使うことで、送金などのアカウント情報の操作ができます。
+
+ここからは、Gariの残高取得やGariを送金する操作を`Inner API`で行います。
 
 #### sushi/backend/server.py
 ```python
