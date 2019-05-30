@@ -3,7 +3,6 @@
 ```bash
 # sushi/
 mkdir backend
-mkdir backend/python
 ```
 
 ## uniqys initする
@@ -14,12 +13,13 @@ uniqys dev-init
 ```
 
 ## dapp.jsonを編集する
-#### sushi/dapp.json
+#### backend/dapp.json
 実行されるappのコマンドを変更する
 ```json
-"startApp": "python backend/server.py"
+"startApp": "python server.py"
 ```
 
+#### backend/uniqys.json
 p2pのネットワークを形成しないようにする（今回はローカルで動作するため）
 ```json
 "network": {
@@ -44,12 +44,12 @@ p2pのネットワークを形成しないようにする（今回はローカ�
 ```
 
 ## 必要なpythonライブラリをインストールする
-```sh
-cd python
+```bash
+# sushi/backend/
 pip install bottle pymemcache requests
 ```
 
-## `backend/python/server.py` を編集する
+## `backend/server.py` を編集する
 memcacheに関わる部分はmessagesと同様にDaoクラスの中で扱う
 
 #### sushi/backend/server.py
@@ -377,11 +377,11 @@ npm run build
 ```python
 @route('/')
 def index():
-    return static_file('index.html', root='frontend/dist')
+    return static_file('index.html', root='../frontend/dist')
 
 @route('/<path:path>')
 def file_path(path):
-    return static_file(path, root='frontend/dist')
+    return static_file(path, root='../frontend/dist')
 ```
 
 ## 完成！
@@ -389,7 +389,7 @@ def file_path(path):
 動作を確認してみましょう。一通りのおすし操作をすることができるようになりました！
 
 ```bash
-# /sushi/
+# /sushi/backend/
 
 uniqys start
 ```
