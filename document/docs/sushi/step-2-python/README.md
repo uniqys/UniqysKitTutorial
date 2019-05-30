@@ -102,6 +102,9 @@ class Dao:
             self.db.set('count', 1)
             return 1
 
+    def set_sushi(self, sushi):
+        self.db.set('sushi:'+str(sushi['id']), sushi)
+
 dao = Dao(DB_HOST, DB_PORT)
 
 @route('/api/generate', method='POST')
