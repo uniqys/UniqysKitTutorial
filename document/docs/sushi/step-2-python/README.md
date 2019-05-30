@@ -340,6 +340,18 @@ async fetchMyGari() {
 ## Gari をもらうボタンを作る
 
 要求者の残高を 10000 Gari にリセットする API を作成します。
+
+#### sushi/backend/server.py
+
+```python
+@route('/api/tap', method='POST')
+def tap_gari():
+    sender = request.get_header('uniqys-sender')
+    uri = 'http://'+INNER_API_HOST+':'+str(INNER_API_PORT)+'/accounts/'+str(sender)+'/balance'
+    response = requests.put(uri, data=json.dumps([10000]), headers={'Content-Type': 'application/json'})
+    return 0
+```
+
 #### sushi/frontend/src/App.vue
 
 Gari をもらうボタンおよび処理を作成します。
@@ -355,31 +367,11 @@ async tap() {
 },
 ```
 
-#### sushi/backend/server.py
-
-```python
-@route('/api/tap', method='POST')
-def tap_gari():
-    sender = request.get_header('uniqys-sender')
-    uri = 'http://'+INNER_API_HOST+':'+str(INNER_API_PORT)+'/accounts/'+str(sender)+'/balance'
-    response = requests.put(uri, data=json.dumps([10000]), headers={'Content-Type': 'application/json'})
-    return 0
-```
-
 ## にぎるときに Gari を減らしてみる
 
 Gari を `sender` から `to` に送る処理を追加し、
 sushi をにぎる際に `OPERATOR_ADDRESS` に対して Gari を送るよう変更します。
 その際、フロントエンド側でも残高を更新するよう変更します。
-
-#### sushi/frontend/src/App.vue
-```js
-async generate() {
-  await this.client.post('/api/generate', {}, { sign: true })
-  this.fetchSushiList()
-  this.fetchMyGari()
-},
-```
 
 #### sushi/backend/server.py
 
@@ -401,20 +393,20 @@ def post_sushi():
     return 0
 ```
 
-## 売ってみる
-
-せっかくなので握った sushi を売ってみましょう。
-API は `POST /api/sell` とします。
-
 #### sushi/frontend/src/App.vue
 
 ```js
-async sell(sushi, price) {
-  await this.client.post('/api/sell', { sushi, price }, { sign: true })
+async generate() {
+  await this.client.post('/api/generate', {}, { sign: true })
   this.fetchSushiList()
   this.fetchMyGari()
 },
 ```
+
+## 売ってみる
+
+せっかくなので握った sushi を売ってみましょう。
+API は `POST /api/sell` とします。
 
 #### sushi/backend/server.py
 
@@ -432,19 +424,19 @@ def sell_sushi():
     dao.set_sushi(new_sushi)
 ```
 
-## 買ってみる
-
-売った sushi は買わないと腐ってしまうので買えるようにしましょう。
-
 #### sushi/frontend/src/App.vue
 
 ```js
-async buy(sushi) {
-  await this.client.post('/api/buy', { sushi }, { sign: true })
+async sell(sushi, price) {
+  await this.client.post('/api/sell', { sushi, price }, { sign: true })
   this.fetchSushiList()
   this.fetchMyGari()
 },
 ```
+
+## 買ってみる
+
+売った sushi は買わないと腐ってしまうので買えるようにしましょう。
 
 #### sushi/backend/server.py
 
@@ -468,6 +460,16 @@ def buy_sushi():
     transfer_gari(sender, seller, price)
 
     return 0
+```
+
+#### sushi/frontend/src/App.vue
+
+```js
+async buy(sushi) {
+  await this.client.post('/api/buy', { sushi }, { sign: true })
+  this.fetchSushiList()
+  this.fetchMyGari()
+},
 ```
 
 ## 完成！
