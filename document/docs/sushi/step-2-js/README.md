@@ -49,11 +49,11 @@ uniqys dev-init
 
 sushi では下記のモジュールを用います。
 
-- express
-- memcached
-- body-parser
-- keccak
-- axios
+- express: 軽量な Web Application Framework ライブラリ
+- body-parser: 受け取ったHTTPリクエストをパースするライブラリ
+- memcached: javascript から memcache を呼び出すライブラリ
+- keccak: ハッシュ関数の一種 "Keccak" を使えるようにするライブラリ
+- axios: async/await を用いた HTTP クライアントを提供するライブラリ
 
 ```bash
 # sushi/backend/
