@@ -1,26 +1,28 @@
 # Step 2 for python
-## backendディレクトリ作る
+
+## backend に Uniqys Kit を導入
+
+`@uniqys/cli`で導入される`uniqys dev-init`を用い、`backend` ディレクトリに Uniqys Kit に必要なファイルを生成します。
+
 ```bash
 # sushi/
 mkdir backend
-mkdir backend/python
-```
-
-## uniqys initする
-```bash
-# sushi/
 cd backend
 uniqys dev-init
 ```
 
-## dapp.jsonを編集する
-#### sushi/dapp.json
-実行されるappのコマンドを変更する
+#### backend/dapp.json
+
+`uniqys start` の実行するコマンドを python のものに変更します。
+
 ```json
-"startApp": "python backend/server.py"
+"startApp": "python server.py"
 ```
 
-p2pのネットワークを形成しないようにする（今回はローカルで動作するため）
+#### backend/uniqys.json
+
+今回はローカルのみで動作するため、p2p のネットワークを形成しないようにします。
+
 ```json
 "network": {
   "port": 5665,
@@ -43,16 +45,25 @@ p2pのネットワークを形成しないようにする（今回はローカ�
 }
 ```
 
-## 必要なpythonライブラリをインストールする
-```sh
-cd python
+## 必要な python ライブラリをインストールする
+
+sushi では下記のライブラリを用います。
+
+- bottle: 軽量な Web Application Framework ライブラリ
+- pymemcache: python から memcache を呼び出すライブラリ
+- requests: HTTP Request を扱いやすくするライブラリ
+
+```bash
+# sushi/backend/
 pip install bottle pymemcache requests
 ```
 
-## `backend/python/server.py` を編集する
-memcacheに関わる部分はmessagesと同様にDaoクラスの中で扱う
+## `backend/server.py` を編集する
+
+memcache に関わる部分は messages と同様に Dao クラスの中で扱います。
 
 #### sushi/backend/server.py
+
 ```python
 import json
 import hashlib
@@ -91,7 +102,11 @@ class Dao:
 ```
 
 ## `POST '/api/generate'` を作る
+
+sushi を生成する API を作成します。
+
 #### sushi/backend/server.py
+
 ```python
 class Dao:
     def incr_count(self):
@@ -101,6 +116,9 @@ class Dao:
         else:
             self.db.set('count', 1)
             return 1
+
+    def set_sushi(self, sushi):
+        self.db.set('sushi:'+str(sushi['id']), sushi)
 
 dao = Dao(DB_HOST, DB_PORT)
 
@@ -123,15 +141,17 @@ def post_sushi():
     }
     dao.set_sushi(sushi)
 
-    transfer_gari(owner, OPERATOR_ADDRESS, 100)
-
     return 0
 
 run(host=APP_HOST, port=APP_PORT, debug=True, reloader=True)
 ```
 
 ## `GET /api/sushiList` を作る
+
+存在する sushi を取得する API を作成します。
+
 #### sushi/backend/server.py
+
 ```python
 class Dao:
     def get_count(self):
@@ -150,50 +170,64 @@ def get_sushi_list():
     return {'sushiList': sushi_list}
 ```
 
-## frontendを修正してgenerateとsushiListを叩けるようにする
+## frontend から `/api/generate` と `/api/sushiList` を叩けるようにする
+
+frontend で必要になる Easy Client を導入します。
+
 ```bash
-# sushi/frontend
+# sushi/frontend/
 
 npm install --save @uniqys/easy-client
 ```
 
-`frontend/package.json` を修正
+uniqys node の gateway と `vue-cli-service` がデフォルトではどちらもポート 8080 を使用するため、vue で使用するポートを `frontend/package.json` で変更します。
+
 #### sushi/frontend/package.json
+
 ```json
 "serve": "vue-cli-service serve --port 3000",
 ```
-uniqys nodeのgatewayが8080で、vueのデフォルトポート番号とかぶるので変更します
 
-ここまでで、実際に動くことが確認できると思います
+## frontend から gateway を叩く
 
-## frontendからgatewayを叩く
-**こっから難しいかも**
+フロントエンドでさきほどインストールした Easy Client を読み込みます
 
 #### sushi/frontend/src/App.vue
+
 ```js
 import { EasyClientForBrowser } from '@uniqys/easy-client'
 ```
 
 #### sushi/frontend/src/App.vue
+
+`data` を修正します。
+
 ```js
-{
-  client: new EasyClientForBrowser('http://localhost:3000'),
-  myGari: 0,
-  myAddress: '',
-  sushiList: []
+data() {
+  return {
+    client: new EasyClientForBrowser('http://localhost:8080'),
+    myGari: 0,
+    myAddress: '',
+    price: [],
+    sushiList: []
+  }
 }
 ```
-dataを修正 デフォルトはなにもなし
 
 #### sushi/frontend/src/App.vue
+
+ブロックチェーン上でのクライアントのアドレスを取得します。
+
 ```js
 async fetchMyAddress() {
   this.myAddress = this.client.address.toString()
 },
 ```
-アドレスを取得
 
 #### sushi/frontend/src/App.vue
+
+さきほど作成した `/api/sushiList` から、sushi のリストを取得します。
+
 ```js
 async fetchSushiList() {
   const response = await this.client.get('/api/sushiList')
@@ -201,23 +235,80 @@ async fetchSushiList() {
   this.sushiList = sushiList
 },
 ```
-おすしリストを取得
 
 #### sushi/frontend/src/App.vue
+
+さきほど作成した `/api/generate` に POST することで新しい sushi を生成できるようにします。
+
+```js
+async generate() {
+  await this.client.post('/api/generate', {}, { sign: true })
+  this.fetchSushiList()
+},
+```
+
+#### sushi/frontend/src/App.vue
+
+ページのロード時にアドレスと sushi のリストを取得します。
+
 ```js
 created() {
   this.fetchMyAddress()
   this.fetchSushiList()
 },
 ```
-ページ更新時に取得してくる
 
-## gariを取得できるようにする
-Uniqys KitのEasy Frameworkが提供している非公開APIの`Inner API`を使うことで、送金などのアカウント情報の操作ができます。
+## 動作確認
 
-ここからは、Gariの残高取得やGariを送金する操作を`Inner API`で行います。
+ここまでで sushi をにぎることができるはずなので、動かしてみましょう。
+まず、フロントエンドをビルドします。
+
+```bash
+# sushi/frontend/
+
+npm run build
+```
+
+これにより、 `sushi/frontend/dist` に、フロントエンドのファイルが生成されます。
+
+次に、生成されたファイルを bottle で配信できるようにします。
 
 #### sushi/backend/server.py
+
+```python
+@route('/')
+def index():
+    return static_file('index.html', root='../frontend/dist')
+
+@route('/<path:path>')
+def file_path(path):
+    return static_file(path, root='../frontend/dist')
+```
+
+そして、`uniqys start` で起動します！
+
+```bash
+# sushi/backend/
+
+uniqys start
+```
+
+`http://localhost:8080` にアクセスすると、これまで作成してきたフロントエンドのページが確認できます。
+
+今後、フロントエンドの更新を行う場合は、frontend ディレクトリで `npm run build` を行ってください
+
+**ただし、 `npm run build` するときは python 2 系、`uniqys start` するときは python 3 系を使用してください。**
+
+## Gari を取得できるようにする
+
+Uniqys Kit の Easy Framework が提供している非公開 API の`Inner API`を使うことで、送金などのアカウント情報の操作ができます。
+
+ここからは、Gari の残高取得や Gari を送金する操作を backend から `Inner API` を通して行います。
+
+#### sushi/backend/server.py
+
+現在持っている Gari を取得する API を作成します。
+
 ```python
 @route('/api/gari')
 def get_gari():
@@ -229,6 +320,9 @@ def get_gari():
 ```
 
 #### sushi/frontend/src/App.vue
+
+フロントエンドから Gari を取得するメソッドを生成し、ページのロード時に Gari を読み込みます。
+
 ```js
 created() {
   this.fetchMyAddress()
@@ -243,21 +337,12 @@ async fetchMyGari() {
 },
 ```
 
-## Gariをもらうボタンを作る
-#### sushi/frontend/src/App.vue
-```html
-<button @click="tap()">Gariをもらう</button>
-```
+## Gari をもらうボタンを作る
 
-#### sushi/frontend/src/App.vue
-```js
-async tap() {
-  await this.client.post('/api/tap', {}, { sign: true })
-  this.fetchMyGari()
-},
-```
+要求者の残高を 10000 Gari にリセットする API を作成します。
 
 #### sushi/backend/server.py
+
 ```python
 @route('/api/tap', method='POST')
 def tap_gari():
@@ -267,18 +352,29 @@ def tap_gari():
     return 0
 ```
 
-## にぎるときにGariを減らしてみる
-
 #### sushi/frontend/src/App.vue
+
+Gari をもらうボタンおよび処理を作成します。
+
+```html
+<button @click="tap()">Gariをもらう</button>
+```
+
 ```js
-async generate() {
-  await this.client.post('/api/generate', {}, { sign: true })
-  this.fetchSushiList()
+async tap() {
+  await this.client.post('/api/tap', {}, { sign: true })
   this.fetchMyGari()
 },
 ```
 
+## にぎるときに Gari を減らしてみる
+
+Gari を `sender` から `to` に送る処理を追加し、
+sushi をにぎる際に `OPERATOR_ADDRESS` に対して Gari を送るよう変更します。
+その際、フロントエンド側でも残高を更新するよう変更します。
+
 #### sushi/backend/server.py
+
 ```python
 def transfer_gari(sender, to, value):
     uri = 'http://'+INNER_API_HOST+':'+str(INNER_API_PORT)+'/accounts/'+str(sender)+'/transfer'
@@ -297,18 +393,23 @@ def post_sushi():
     return 0
 ```
 
-## 売ってみる
-
 #### sushi/frontend/src/App.vue
+
 ```js
-async sell(sushi, price) {
-  await this.client.post('/api/sell', { sushi, price }, { sign: true })
+async generate() {
+  await this.client.post('/api/generate', {}, { sign: true })
   this.fetchSushiList()
   this.fetchMyGari()
 },
 ```
 
+## 売ってみる
+
+せっかくなので握った sushi を売ってみましょう。
+API は `POST /api/sell` とします。
+
 #### sushi/backend/server.py
+
 ```python
 @route('/api/sell', method='POST')
 def sell_sushi():
@@ -322,20 +423,23 @@ def sell_sushi():
 
     dao.set_sushi(new_sushi)
 ```
-*他の人のおすしも販売できちゃう・・*
-
-## 買ってみる
 
 #### sushi/frontend/src/App.vue
+
 ```js
-async buy(sushi) {
-  await this.client.post('/api/buy', { sushi }, { sign: true })
+async sell(sushi, price) {
+  await this.client.post('/api/sell', { sushi, price }, { sign: true })
   this.fetchSushiList()
   this.fetchMyGari()
 },
 ```
 
+## 買ってみる
+
+売った sushi は買わないと腐ってしまうので買えるようにしましょう。
+
 #### sushi/backend/server.py
+
 ```python
 @route('/api/buy', method='POST')
 def buy_sushi():
@@ -357,48 +461,34 @@ def buy_sushi():
 
     return 0
 ```
-*売ってないおすしも、自分のおすしも買えちゃう・・*
 
-## フロントエンドとつなげる！
-frontendをビルドします
-```bash
-# /sushi/frontend
+#### sushi/frontend/src/App.vue
 
-npm run build
-```
-これにより、 `sushi/frontend/dist` に、フロントエンドのファイルが生成されます
-
-次に、生成されたファイルをbottleで配信できるようにします
-
-#### sushi/backend/server.py
-```python
-@route('/')
-def index():
-    return static_file('index.html', root='frontend/dist')
-
-@route('/<path:path>')
-def file_path(path):
-    return static_file(path, root='frontend/dist')
+```js
+async buy(sushi) {
+  await this.client.post('/api/buy', { sushi }, { sign: true })
+  this.fetchSushiList()
+  this.fetchMyGari()
+},
 ```
 
 ## 完成！
-お疲れ様でした！
-動作を確認してみましょう。一通りのおすし操作をすることができるようになりました！
+
+おつかれさまでした！ さきほどと同じ手順で動作確認をしてみましょう。
 
 ```bash
-# /sushi/
-
+# sushi/frontend/
+npm run build
+cd ../backend
 uniqys start
 ```
 
-`http://localhost:8080` にアクセスすると、これまで作成してきたフロントエンドのページが確認できます
-
-今後、フロントエンドの更新を行う場合は、frontendディレクトリで `npm run build` を行ってください
-ただし、 `npm run build` するときはpython 2系、`uniqys start` するときはpython 3系を使用してください。
+`http://localhost:8080` にアクセスすると、 sushi をにぎれること、にぎった sushi を売り買いできることが確認できます！
 
 ## 追加課題
+
 - にぎったとき、あたらしいおすしが後ろの方に追加されてしまい微妙です。いい感じにしてみましょう
-- Gariがなくてもにぎったり購入したりができてしまいます。できないようにしてみましょう
-- 他の人のおすしも販売できてしまいます。backendを修正してみましょう
-- 売ってないおすしも、自分のおすしも買えてしまいます。backendを修正してみましょう
+- Gari がなくてもにぎったり購入したりができてしまいます。できないようにしてみましょう
+- 他の人のおすしも販売できてしまいます。backend を修正してみましょう
+- 売ってないおすしも、自分のおすしも買えてしまいます。backend を修正してみましょう
 - 一回販売すると、キャンセルすることができません。キャンセルできるようにしてみましょう
