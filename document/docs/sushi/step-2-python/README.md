@@ -126,8 +126,6 @@ def post_sushi():
     }
     dao.set_sushi(sushi)
 
-    transfer_gari(owner, OPERATOR_ADDRESS, 100)
-
     return 0
 
 run(host=APP_HOST, port=APP_PORT, debug=True, reloader=True)
@@ -180,9 +178,10 @@ import { EasyClientForBrowser } from '@uniqys/easy-client'
 #### sushi/frontend/src/App.vue
 ```js
 {
-  client: new EasyClientForBrowser('http://localhost:3000'),
+  client: new EasyClientForBrowser('http://localhost:8080'),
   myGari: 0,
   myAddress: '',
+  price: [],
   sushiList: []
 }
 ```
@@ -207,6 +206,18 @@ async fetchSushiList() {
 おすしリストを取得
 
 #### sushi/frontend/src/App.vue
+
+```js
+async generate() {
+  await this.client.post('/api/generate', {}, { sign: true })
+  this.fetchSushiList()
+},
+```
+
+おすしをにぎる
+
+#### sushi/frontend/src/App.vue
+
 ```js
 created() {
   this.fetchMyAddress()
@@ -214,6 +225,47 @@ created() {
 },
 ```
 ページ更新時に取得してくる
+
+## 動作確認
+
+ここまでで sushi をにぎることができるはずなので、動かしてみましょう。
+まず、フロントエンドをビルドします。
+
+```bash
+# sushi/frontend/
+
+npm run build
+```
+
+これにより、 `sushi/frontend/dist` に、フロントエンドのファイルが生成されます。
+
+次に、生成されたファイルを bottle で配信できるようにします。
+
+#### sushi/backend/server.py
+
+```python
+@route('/')
+def index():
+    return static_file('index.html', root='../frontend/dist')
+
+@route('/<path:path>')
+def file_path(path):
+    return static_file(path, root='../frontend/dist')
+```
+
+そして、`uniqys start` で起動します！
+
+```bash
+# sushi/backend/
+
+uniqys start
+```
+
+`http://localhost:8080` にアクセスすると、これまで作成してきたフロントエンドのページが確認できます。
+
+今後、フロントエンドの更新を行う場合は、frontend ディレクトリで `npm run build` を行ってください
+
+**ただし、 `npm run build` するときは python 2 系、`uniqys start` するときは python 3 系を使用してください。**
 
 ## gariを取得できるようにする
 Uniqys KitのEasy Frameworkが提供している非公開APIの`Inner API`を使うことで、送金などのアカウント情報の操作ができます。
@@ -362,42 +414,18 @@ def buy_sushi():
 ```
 *売ってないおすしも、自分のおすしも買えちゃう・・*
 
-## フロントエンドとつなげる！
-frontendをビルドします
-```bash
-# /sushi/frontend
-
-npm run build
-```
-これにより、 `sushi/frontend/dist` に、フロントエンドのファイルが生成されます
-
-次に、生成されたファイルをbottleで配信できるようにします
-
-#### sushi/backend/server.py
-```python
-@route('/')
-def index():
-    return static_file('index.html', root='../frontend/dist')
-
-@route('/<path:path>')
-def file_path(path):
-    return static_file(path, root='../frontend/dist')
-```
-
 ## 完成！
-お疲れ様でした！
-動作を確認してみましょう。一通りのおすし操作をすることができるようになりました！
+
+おつかれさまでした！ さきほどと同じ手順で動作確認をしてみましょう。
 
 ```bash
-# /sushi/backend/
-
+# sushi/frontend/
+npm run build
+cd ../backend
 uniqys start
 ```
 
-`http://localhost:8080` にアクセスすると、これまで作成してきたフロントエンドのページが確認できます
-
-今後、フロントエンドの更新を行う場合は、frontendディレクトリで `npm run build` を行ってください
-ただし、 `npm run build` するときはpython 2系、`uniqys start` するときはpython 3系を使用してください。
+`http://localhost:8080` にアクセスすると、 sushi をにぎれること、にぎった sushi を売り買いできることが確認できます！
 
 ## 追加課題
 - にぎったとき、あたらしいおすしが後ろの方に追加されてしまい微妙です。いい感じにしてみましょう
